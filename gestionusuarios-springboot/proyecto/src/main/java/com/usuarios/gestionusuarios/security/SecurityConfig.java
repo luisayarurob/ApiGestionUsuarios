@@ -3,6 +3,7 @@ package com.usuarios.gestionusuarios.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -24,25 +25,36 @@ public class SecurityConfig {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
 
-    /**
-     * Bean de PasswordEncoder con BCrypt para encriptación de contraseñas.
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    /**
-     * Bean de AuthenticationManager para autenticación.
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
     /**
-     * Configuración de seguridad HTTP: rutas públicas y protegidas.
-     * Se añade filtro JWT antes del UsernamePasswordAuthenticationFilter.
+     * Reglas de seguridad HTTP:
+     *
+     * Rutas públicas:
+     *   POST /api/auth/login    → cualquiera
+     *   POST /api/auth/register → cualquiera
+     *
+     * Rutas exclusivas de ADMIN:
+     *   GET    /api/usuarios          → listar todos
+     *   DELETE /api/usuarios/{id}     → eliminar cualquier usuario (no puede eliminarse a sí mismo, lógica en controller)
+     *
+     * Rutas de cualquier usuario autenticado:
+     *   GET    /api/usuarios/perfil         → ver su perfil
+     *   PUT    /api/usuarios/perfil         → editar su propio perfil  (manejado en PUT /{id} con validación)
+     *   DELETE /api/usuarios/perfil/baja    → dar de baja su propia cuenta
+     *   GET    /api/usuarios/{id}           → ver usuario (controller valida que sea él o admin)
+     *   PUT    /api/usuarios/{id}           → editar usuario (controller valida que sea él o admin)
+     *
+     * Nota: CustomUserDetailsService registra los roles como "ROLE_" + nombre.toUpperCase()
+     * Por eso usamos hasRole("ADMIN") que Spring transforma internamente a "ROLE_ADMIN".
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -52,11 +64,18 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+
+                // Solo ADMIN puede listar todos los usuarios y eliminar por ID
+                .requestMatchers(HttpMethod.GET, "/api/usuarios").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/usuarios/{id}").hasRole("ADMIN")
+
+                // Cualquier usuario autenticado puede acceder al resto de /api/usuarios/**
+                .requestMatchers("/api/usuarios/**").authenticated()
+
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }
