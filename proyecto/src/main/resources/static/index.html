@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesion</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+    <!-- Despues de aca coloco mis css -->
+    <link href="/css/estilos.css" rel="stylesheet">
+</head>
+<body>
+    <div class="decoracion-fondo"></div>
+    <div class="fondo-principal">
+            
+        <div class="contenedor shadow">
+
+            <div class="card-body p-5 text-center">
+
+                <div class="icono-login">
+                    <img src="/icon/usuario2.png" alt="Usuario">
+                </div>
+
+                <h1 class="titulo-login mb-5">Inicio de sesión</h1>
+                
+                <form id="form-login">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">
+                            <i class="bi bi-envelope-heart-fill fs-4"></i>
+                        </span>
+
+                        <input
+                            id="email"
+                            type="email-login"
+                            class="form-control"
+                            placeholder="Correo electrónico">
+                    </div>
+
+                    <div class="input-group mb-3">
+                        <span class="input-group-text">
+                            <i class="bi bi-lock-fill fs-4"></i>
+                        </span>
+
+                        <input
+                            id="contrasena-login"
+                            type="password"
+                            class="form-control"
+                            placeholder="Contraseña">
+                    </div>
+
+                    <button class="btn btn-form" id="btn-login">
+                        Iniciar sesion
+                    </button>
+
+                    <p class="text-center mt-3 text-muted">
+                        ¿No tienes una cuenta?
+                        <a href="registro.html" class="text-decoration-none">
+                            Regístrate
+                        </a>
+                    </p>
+                </form>
+            </div>
+        </div>   
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Despues de aca coloco mis js-->
+    <script src="/service/app.js"></script>
+</body>
+</html>
